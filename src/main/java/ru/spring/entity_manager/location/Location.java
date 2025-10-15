@@ -1,6 +1,6 @@
 package ru.spring.entity_manager.location;
 
-record Location(
+public record Location(
         Integer id,
         String name,
         String address,

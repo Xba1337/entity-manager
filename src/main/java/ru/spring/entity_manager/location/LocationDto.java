@@ -2,7 +2,7 @@ package ru.spring.entity_manager.location;
 
 import jakarta.validation.constraints.*;
 
-record LocationDto(
+public record LocationDto(
 
         @Null
         Integer id,
