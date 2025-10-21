@@ -38,24 +38,28 @@ public class LocationService {
 
     @Transactional(readOnly = true)
     public Location getLocationById(Integer locationId) {
-        locationExistingValidation(locationId);
         LocationEntity locationEntity = locationRepository.findById(locationId)
-                .orElseThrow();
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Локация с id=%s не существует".formatted(locationId))
+                );
 
         return locationEntityConverter.convertToModel(locationEntity);
     }
 
     public Location updateLocation(Integer locationId, Location location) {
-        locationExistingValidation(locationId);
-        locationRepository.updateLocation(
-                locationId,
-                location.name(),
-                location.address(),
-                location.capacity(),
-                location.description()
-        );
+        LocationEntity locationToUpdate = locationRepository.findById(locationId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Локация с id=%s не существует".formatted(locationId))
+                );
 
-        return locationEntityConverter.convertToModel(locationRepository.findById(locationId).orElseThrow());
+        locationToUpdate.setName(location.name());
+        locationToUpdate.setAddress(location.address());
+        locationToUpdate.setCapacity(location.capacity());
+        locationToUpdate.setDescription(location.description());
+
+        LocationEntity updatedLocation = locationRepository.save(locationToUpdate);
+
+        return locationEntityConverter.convertToModel(updatedLocation);
     }
 
     private void locationExistingValidation(Integer locationId) {
