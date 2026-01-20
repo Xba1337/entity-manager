@@ -1,6 +1,5 @@
 package ru.spring.entity_manager.location;
 
-
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
