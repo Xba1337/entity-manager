@@ -71,4 +71,12 @@ public class LocationEntity {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

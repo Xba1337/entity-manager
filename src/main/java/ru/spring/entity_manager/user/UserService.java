@@ -1,10 +1,13 @@
 package ru.spring.entity_manager.user;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@Transactional
 public class UserService{
 
     private final UserRepository userRepository;
@@ -27,7 +30,8 @@ public class UserService{
                 null,
                 signUpRequest.login(),
                 encode,
-                UserRole.USER.name()
+                UserRole.USER.name(),
+                List.of()
         );
 
         UserEntity saved = userRepository.save(userEntity);
@@ -38,13 +42,6 @@ public class UserService{
                 encode,
                 saved.getRole()
         );
-    }
-
-    public User getUserByLogin(String login) {
-        UserEntity userEntity = userRepository.findByLogin(login)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        return userEntityConverter.convertToModel(userEntity);
     }
 
     public boolean userExistsByLogin(String login) {

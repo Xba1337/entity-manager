@@ -2,6 +2,9 @@ package ru.spring.entity_manager.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import ru.spring.entity_manager.event.EventEntity;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -19,13 +22,17 @@ public class UserEntity {
     @Size(min = 4)
     private String passwordHash;
 
+    @OneToMany(mappedBy = "owner")
+    private List<EventEntity> events;
+
     private String role;
 
-    public UserEntity(Integer id, String login, String passwordHash, String role) {
+    public UserEntity(Integer id, String login, String passwordHash, String role,List<EventEntity> events) {
         this.id = id;
         this.login = login;
         this.passwordHash = passwordHash;
         this.role = role;
+        this.events = events;
     }
 
     public UserEntity() {}
@@ -60,5 +67,13 @@ public class UserEntity {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<EventEntity> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<EventEntity> events) {
+        this.events = events;
     }
 }

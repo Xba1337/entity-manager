@@ -2,6 +2,8 @@ package ru.spring.entity_manager.user;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UserEntityConverter {
 
@@ -19,7 +21,8 @@ public class UserEntityConverter {
                 user.id(),
                 user.login(),
                 user.passwordHash(),
-                user.role()
+                user.role(),
+                List.of()
         );
     }
 }
