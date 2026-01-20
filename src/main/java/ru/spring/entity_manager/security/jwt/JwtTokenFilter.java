@@ -8,13 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.spring.entity_manager.security.CustomUserDetailsService;
-import ru.spring.entity_manager.user.User;
 import ru.spring.entity_manager.user.UserService;
 
 import java.io.IOException;
@@ -25,12 +23,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final Logger log = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     private final JwtTokenManager jwtTokenManager;
-    private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
 
-    public JwtTokenFilter(JwtTokenManager jwtTokenManager, UserService userService, CustomUserDetailsService customUserDetailsService) {
+    public JwtTokenFilter(JwtTokenManager jwtTokenManager, CustomUserDetailsService customUserDetailsService) {
         this.jwtTokenManager = jwtTokenManager;
-        this.userService = userService;
         this.customUserDetailsService = customUserDetailsService;
     }
 

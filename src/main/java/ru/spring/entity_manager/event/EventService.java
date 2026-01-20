@@ -37,8 +37,7 @@ public class EventService {
         Location choosedLocation = locationService.getLocationById(request.locationId());
 
         if (choosedLocation.capacity() < request.capacity()) {
-            throw new IllegalArgumentException("Location capacity: %s" +
-                    " is not enough for the event, choose another location with a capacity greater than or equal to: %s"
+            throw new IllegalArgumentException("Location capacity: %s is not enough for the event, choose another location with a capacity greater than or equal to: %s"
                             .formatted(choosedLocation.capacity(), request.capacity()));
         }
 

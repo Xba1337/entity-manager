@@ -55,7 +55,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
             UPDATE EventEntity e
             SET e.status = ru.spring.entity_manager.event.EventStatus.COMPLETED
             WHERE e.status = ru.spring.entity_manager.event.EventStatus.STARTED
-            AND :now >= e.date + e.duration * 1 minute 
+            AND :now >= e.date + e.duration * 1 minute
             """)
     int updateEventsStatusesFromStartedToCompleted(@Param("now") LocalDateTime now);
 }
