@@ -20,7 +20,7 @@ public record EventCreationRequest(
         @PositiveOrZero(message = "Price cannot be negative")
         Integer price,
 
-        @Min(value = 1,message = "The time must be at least 30 minutes")
+        @Min(value = 30,message = "The time must be at least 30 minutes")
         Integer duration,
 
         @NotNull(message = "Event name is mandatory")

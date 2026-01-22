@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.spring.entity_manager.security.CustomUserDetailsService;
-import ru.spring.entity_manager.user.UserService;
 
 import java.io.IOException;
 

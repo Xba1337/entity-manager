@@ -60,7 +60,7 @@ public class SecurityConfiguration {
                                 .hasAnyAuthority("ADMIN", "USER")
 
                                 .requestMatchers(HttpMethod.GET, "/registrations/my")
-                                .permitAll()
+                                .hasAnyAuthority("USER")
                                 .requestMatchers(HttpMethod.POST, "/registrations/**")
                                 .hasAnyAuthority("USER")
                                 .requestMatchers(HttpMethod.DELETE, "/registrations/**")
