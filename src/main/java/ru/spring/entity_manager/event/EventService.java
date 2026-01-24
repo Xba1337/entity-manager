@@ -119,6 +119,11 @@ public class EventService {
                 .orElseThrow(() ->
                         new IllegalArgumentException("Event with id:%s not found".formatted(id)));
 
+        if (eventToUpdate.getCapacity() < event.capacity()) {
+            throw new IllegalArgumentException("The location cannot accommodate the number of people: %s. Location capacity is: %s."
+                    .formatted(event.capacity(), eventToUpdate.getCapacity()));
+        }
+
         eventToUpdate.setDate(event.date());
         eventToUpdate.setCapacity(event.capacity());
         eventToUpdate.setPrice(event.price());
