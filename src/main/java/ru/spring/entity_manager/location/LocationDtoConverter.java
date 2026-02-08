@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 public class LocationDtoConverter {
 
     public Location convertToModel(LocationDto locationDto) {
-
         return new Location(
                 locationDto.id(),
                 locationDto.name(),

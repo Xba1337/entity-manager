@@ -50,6 +50,22 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/locations/**")
                                 .hasAnyAuthority("ADMIN", "USER")
 
+                                .requestMatchers(HttpMethod.GET, "/events/**")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/events")
+                                .hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers(HttpMethod.PUT, "/events/**")
+                                .hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers(HttpMethod.DELETE, "/events/**")
+                                .hasAnyAuthority("ADMIN", "USER")
+
+                                .requestMatchers(HttpMethod.GET, "/registrations/my")
+                                .hasAnyAuthority("USER")
+                                .requestMatchers(HttpMethod.POST, "/registrations/**")
+                                .hasAnyAuthority("USER")
+                                .requestMatchers(HttpMethod.DELETE, "/registrations/**")
+                                .hasAnyAuthority("USER")
+
                                 .requestMatchers(HttpMethod.POST, "/users/**")
                                 .permitAll()
 

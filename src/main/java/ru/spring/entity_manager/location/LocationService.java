@@ -6,11 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 public class LocationService {
 
     private final LocationEntityConverter locationEntityConverter;
     private final LocationRepository locationRepository;
-
 
     public LocationService(LocationEntityConverter locationEntityConverter, LocationRepository locationRepository) {
         this.locationEntityConverter = locationEntityConverter;
