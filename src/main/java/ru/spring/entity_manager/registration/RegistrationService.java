@@ -10,7 +10,6 @@ import ru.spring.entity_manager.event.*;
 import ru.spring.entity_manager.user.UserEntity;
 import ru.spring.entity_manager.user.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -27,8 +27,7 @@ public class EventNotificationSender {
                 event
         );
 
-        result.thenAccept(sendResult -> {
-            log.info("Event notification sent: {}", sendResult);
-        });
+        result.thenAccept(sendResult ->
+                log.info("Event notification sent: {}", sendResult));
     }
 }
