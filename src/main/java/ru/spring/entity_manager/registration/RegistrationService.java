@@ -7,8 +7,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.spring.entity_manager.event.*;
+import ru.spring.entity_manager.user.UserEntity;
 import ru.spring.entity_manager.user.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -111,5 +113,15 @@ public class RegistrationService {
                 .orElseThrow(() ->
                         new IllegalStateException("The authenticated user is missing from the database"))
                 .getId();
+    }
+
+    public List<String> getUsersRegisteredOnEvent(Integer eventId) {
+        return registrationRepository.findUsersIdRegisteredOnEvent(eventId)
+                .stream()
+                .map(userId -> userRepository.findById(userId)
+                        .orElseThrow(() ->
+        new IllegalArgumentException("User with id:%s not found".formatted(userId))))
+                .map(UserEntity::getLogin)
+                .toList();
     }
 }

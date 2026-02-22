@@ -6,12 +6,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.spring.entity_manager.event.notification.EventChangeMessage;
+import ru.spring.entity_manager.event.notification.EventNotificationSender;
+import ru.spring.entity_manager.event.notification.FieldChange;
 import ru.spring.entity_manager.location.Location;
 import ru.spring.entity_manager.location.LocationService;
+import ru.spring.entity_manager.registration.RegistrationService;
 import ru.spring.entity_manager.user.UserEntity;
 import ru.spring.entity_manager.user.UserRepository;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
@@ -23,12 +27,18 @@ public class EventService {
     private final EventMapper eventMapper;
     private final LocationService locationService;
     private final UserRepository userRepository;
+    private final EventNotificationSender eventNotificationSender;
+    private final RegistrationService registrationService;
+    private final EventDifferencesUtil eventDifferencesUtil;
 
-    public EventService(EventRepository eventRepository, EventMapper eventMapper, LocationService locationService, UserRepository userRepository) {
+    public EventService(EventRepository eventRepository, EventMapper eventMapper, LocationService locationService, UserRepository userRepository, EventNotificationSender eventNotificationSender, RegistrationService registrationService, EventDifferencesUtil eventDifferencesUtil) {
         this.eventRepository = eventRepository;
         this.eventMapper = eventMapper;
         this.locationService = locationService;
         this.userRepository = userRepository;
+        this.eventNotificationSender = eventNotificationSender;
+        this.registrationService = registrationService;
+        this.eventDifferencesUtil = eventDifferencesUtil;
     }
 
     public Event createEvent(EventCreationRequest request) {
@@ -38,7 +48,7 @@ public class EventService {
 
         if (choosedLocation.capacity() < request.capacity()) {
             throw new IllegalArgumentException("Location capacity: %s is not enough for the event, choose another location with a capacity greater than or equal to: %s"
-                            .formatted(choosedLocation.capacity(), request.capacity()));
+                    .formatted(choosedLocation.capacity(), request.capacity()));
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -106,8 +116,12 @@ public class EventService {
         EventEntity eventEntity = eventRepository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Event with id:%s not found".formatted(id)));
+        EventEntity oldEvent = eventEntity.copy();
 
         eventRepository.delete(eventEntity);
+
+        EventChangeMessage eventChangeMessage = createEventChangeMessage(oldEvent, null);
+        eventNotificationSender.sendEventNotification(eventChangeMessage);
 
         log.info("Deleted event with id: {}", id);
     }
@@ -115,7 +129,7 @@ public class EventService {
     public Event updateEvent(Integer id, Event event) {
         log.info("Updating event with id: {}", id);
 
-        EventEntity eventToUpdate= eventRepository.findById(id)
+        EventEntity eventToUpdate = eventRepository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Event with id:%s not found".formatted(id)));
 
@@ -123,6 +137,7 @@ public class EventService {
             throw new IllegalArgumentException("The location cannot accommodate the number of people: %s. Location capacity is: %s."
                     .formatted(event.capacity(), eventToUpdate.getCapacity()));
         }
+        EventEntity oldEvent = eventToUpdate.copy();
 
         eventToUpdate.setDate(event.date());
         eventToUpdate.setCapacity(event.capacity());
@@ -131,11 +146,50 @@ public class EventService {
         eventToUpdate.setStatus(event.status());
         eventToUpdate.setName(event.name());
 
-
         EventEntity updatedEvent = eventRepository.save(eventToUpdate);
 
         log.info("Updated event with id: {}", id);
+        EventChangeMessage eventChangeMessage = createEventChangeMessage(oldEvent, updatedEvent);
+
+        eventNotificationSender.sendEventNotification(eventChangeMessage);
 
         return eventMapper.toDomain(updatedEvent);
+    }
+
+    private EventChangeMessage createEventChangeMessage(EventEntity oldEntity, EventEntity newEntity) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            throw new IllegalStateException("Authentication is not present");
+        }
+        Event oldEvent = eventMapper.toDomain(oldEntity);
+        Event newEvent;
+        if (newEntity == null) {
+            newEvent = new Event(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    EventStatus.CANCELED,
+                    null
+            );
+        }
+        else newEvent = eventMapper.toDomain(newEntity);
+
+        UserEntity changedByUser = userRepository.findByLogin(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("The authenticated user is missing from the database"));
+        Integer changedByUserId = changedByUser.getId();
+        Map<String, FieldChange<?>> fieldChanges = eventDifferencesUtil.changeMap(oldEvent, newEvent);
+        List<String> usersRegisteredOnEvent = registrationService.getUsersRegisteredOnEvent(oldEntity.getId());
+
+        return new EventChangeMessage(
+                oldEntity.getId(),
+                changedByUserId,
+                oldEntity.getOwner().getId(),
+                fieldChanges,
+                usersRegisteredOnEvent
+        );
     }
 }
