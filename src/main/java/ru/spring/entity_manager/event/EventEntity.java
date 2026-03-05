@@ -139,4 +139,19 @@ public class EventEntity {
     public void setOwner(UserEntity owner) {
         this.owner = owner;
     }
+
+    public EventEntity copy() {
+        EventEntity eventEntity = new EventEntity();
+        eventEntity.setId(id);
+        eventEntity.setDate(date);
+        eventEntity.setLocationId(locationId);
+        eventEntity.setCapacity(capacity);
+        eventEntity.setPrice(price);
+        eventEntity.setDuration(duration);
+        eventEntity.setStatus(status);
+        eventEntity.setName(name);
+        eventEntity.setRegistrations(registrations);
+        eventEntity.setOwner(owner);
+        return eventEntity;
+    }
 }

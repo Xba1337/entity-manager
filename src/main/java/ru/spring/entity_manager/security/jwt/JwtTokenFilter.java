@@ -1,5 +1,6 @@
 package ru.spring.entity_manager.security.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +42,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String loginFromToken;
         try {
             loginFromToken = jwtTokenManager.getLoginFromToken(token);
+        }catch (ExpiredJwtException e) {
+            log.debug("JWT token expired");
+            filterChain.doFilter(request, response);
+            return;
         } catch (Exception e) {
             log.error("Error while getting login from token", e);
             filterChain.doFilter(request, response);
@@ -52,7 +57,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 new UsernamePasswordAuthenticationToken
                         (
                                 user,
-                                null,
+                                token,
                                 user.getAuthorities()
                         );
         SecurityContextHolder.getContext()

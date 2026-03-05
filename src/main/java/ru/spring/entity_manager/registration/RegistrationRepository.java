@@ -20,13 +20,21 @@ public interface RegistrationRepository extends JpaRepository<RegistrationEntity
             @Param("userId") Integer userId
     );
 
-    @Query("""
-        SELECT r from RegistrationEntity r
-        where r.event.id = :eventId
-        and r.userId = :userId
-    """)
+    @Query(value = """
+            SELECT r FROM RegistrationEntity r
+            WHERE r.event.id = :eventId
+            AND r.userId = :userId
+            """)
     Optional<RegistrationEntity> findRegistration(
             @Param("userId") Integer userId,
+            @Param("eventId") Integer eventId
+    );
+
+    @Query(value = """
+            SELECT r.userId from RegistrationEntity r
+            where r.event.id = :eventId
+            """)
+    List<Integer> findUsersIdRegisteredOnEvent(
             @Param("eventId") Integer eventId
     );
 }
